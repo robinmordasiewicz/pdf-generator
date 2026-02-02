@@ -29,7 +29,7 @@ export function generateCssFromTokens(): string {
       font-size: ${rem(components.paragraph.fontSize)};
       line-height: ${typography.lineHeight.relaxed};
       color: ${colors.gray[900]};
-      background-color: ${colors.gray[100]};
+      background-color: ${colors.white};
     }
 
     .container {
@@ -50,8 +50,9 @@ export function generateCssFromTokens(): string {
     }
 
     header h1 {
-      font-size: ${rem(components.heading.h1.fontSize)};
-      color: ${components.heading.h1.color};
+      font-size: ${rem(components.header.fontSize)};
+      font-weight: normal;
+      color: ${components.header.color};
     }
 
     .version {
@@ -126,6 +127,7 @@ export function generateCssFromTokens(): string {
       font-size: ${rem(components.field.text.fontSize)};
       border: ${px(components.field.base.borderWidth)} solid ${colors.gray[400]};
       border-radius: ${px(borders.radius.base)};
+      background-color: ${components.field.base.backgroundColor};
       transition: border-color 0.15s ease;
     }
 
@@ -301,8 +303,6 @@ export function generateCssFromTokens(): string {
       padding: ${rem(components.table.cellPadding)} ${rem(spacing[2])};
       text-align: left;
       vertical-align: middle;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .content-table th {
@@ -310,10 +310,13 @@ export function generateCssFromTokens(): string {
       font-weight: 600;
       color: ${components.table.headerTextColor};
       white-space: nowrap;
+      overflow: visible;
     }
 
     .content-table td {
       vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .table-input {
@@ -322,6 +325,7 @@ export function generateCssFromTokens(): string {
       border: ${px(components.field.base.borderWidth)} solid ${colors.gray[400]};
       border-radius: ${px(borders.radius.sm)};
       font-size: ${rem(components.table.cellFontSize)};
+      background-color: ${components.field.base.backgroundColor};
       box-sizing: border-box;
     }
 
@@ -336,7 +340,7 @@ export function generateCssFromTokens(): string {
       border: ${px(components.field.base.borderWidth)} solid ${colors.gray[400]};
       border-radius: ${px(borders.radius.sm)};
       font-size: ${rem(components.table.cellFontSize)};
-      background: ${colors.white};
+      background-color: ${components.field.base.backgroundColor};
       box-sizing: border-box;
     }
 
