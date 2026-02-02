@@ -22,6 +22,7 @@ import type {
 } from '../../types/index.js';
 import { DEFAULT_CONFIG } from '../../types/index.js';
 import type { ParsedMarkdown } from '../../parsers/index.js';
+import { generateCssFromTokens } from '../../styles/index.js';
 
 export interface HtmlGeneratorOptions {
   markdown?: ParsedMarkdown;
@@ -233,7 +234,10 @@ function renderInlineField(
     labelPosition === 'left' && element.labelWidth
       ? ` style="width: ${element.labelWidth}px; min-width: ${element.labelWidth}px"`
       : '';
-  const fieldStyle = element.width ? ` style="width: ${element.width}px"` : '';
+  // For horizontal layout, apply both width and max-width to prevent overflow
+  const fieldStyle = element.width
+    ? ` style="width: ${element.width}px; max-width: ${element.width}px"`
+    : '';
 
   let fieldHtml = '';
 
@@ -294,6 +298,9 @@ function renderTable(element: TableContent): string {
     ? `<div class="table-label">${escapeHtml(element.label)}</div>`
     : '';
 
+  // Calculate total table width from column widths
+  const totalWidth = columns.reduce((sum, col) => sum + (col.width ?? 100), 0);
+
   // Generate header row
   const headerCells = columns
     .map((col) => `<th style="width: ${col.width}px">${escapeHtml(col.label)}</th>`)
@@ -315,7 +322,7 @@ function renderTable(element: TableContent): string {
 
   return `
     ${tableLabel}
-    <table class="content-table">
+    <table class="content-table" style="width: ${totalWidth}px">
       <thead>${headerRow}</thead>
       <tbody>${dataRows}</tbody>
     </table>`;
@@ -576,388 +583,10 @@ function generateFieldHtml(field: NormalizedFormField): string {
 }
 
 /**
- * Get default CSS styles
+ * Get default CSS styles from design tokens
  */
 function getDefaultStyles(): string {
-  return `
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      background-color: #f5f5f5;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 2rem;
-      background: white;
-      min-height: 100vh;
-    }
-
-    header {
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 2px solid #e0e0e0;
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
-    header h1 {
-      font-size: 1.75rem;
-      color: #1a1a1a;
-    }
-
-    .version {
-      color: #666;
-      font-size: 0.875rem;
-    }
-
-    main {
-      margin-bottom: 2rem;
-    }
-
-    main h2 {
-      margin-top: 1.5rem;
-      margin-bottom: 0.75rem;
-      font-size: 1.25rem;
-      color: #333;
-    }
-
-    main p {
-      margin-bottom: 1rem;
-      color: #555;
-    }
-
-    .form {
-      margin-top: 2rem;
-    }
-
-    .form-page {
-      margin-bottom: 2rem;
-      padding: 1.5rem;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-    }
-
-    .form-page legend {
-      padding: 0 0.5rem;
-      font-weight: 600;
-      color: #666;
-    }
-
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-
-    .form-group label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .required {
-      color: #dc3545;
-      margin-left: 0.25rem;
-    }
-
-    input[type="text"],
-    textarea,
-    select {
-      width: 100%;
-      padding: 0.625rem 0.75rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      transition: border-color 0.15s ease;
-    }
-
-    input[type="text"]:focus,
-    textarea:focus,
-    select:focus {
-      outline: none;
-      border-color: #0066cc;
-      box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
-    }
-
-    .form-check {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .form-check input {
-      width: auto;
-    }
-
-    .form-check label {
-      margin-bottom: 0;
-      font-weight: normal;
-    }
-
-    .radio-group {
-      margin-top: 0.5rem;
-    }
-
-    .signature-field .signature-box {
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      margin-bottom: 0.5rem;
-    }
-
-    .signature-field canvas {
-      display: block;
-      cursor: crosshair;
-    }
-
-    .form-actions {
-      margin-top: 2rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #e0e0e0;
-      display: flex;
-      gap: 1rem;
-    }
-
-    .btn {
-      padding: 0.625rem 1.25rem;
-      font-size: 1rem;
-      font-weight: 500;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background-color 0.15s ease;
-    }
-
-    .btn-primary {
-      background-color: #0066cc;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background-color: #0052a3;
-    }
-
-    .btn-secondary {
-      background-color: #e0e0e0;
-      color: #333;
-    }
-
-    .btn-secondary:hover {
-      background-color: #d0d0d0;
-    }
-
-    .btn-small {
-      padding: 0.375rem 0.75rem;
-      font-size: 0.875rem;
-    }
-
-    footer {
-      margin-top: 3rem;
-      padding-top: 1rem;
-      border-top: 1px solid #e0e0e0;
-      text-align: center;
-      color: #999;
-      font-size: 0.875rem;
-    }
-
-    /* Schema content styles */
-    .schema-content-form {
-      margin-top: 1rem;
-    }
-
-    .content-rule {
-      border: none;
-      border-top: 1px solid #ccc;
-      margin: 1.5rem 0;
-    }
-
-    .spacer {
-      display: block;
-    }
-
-    /* Inline field styles */
-    .inline-field {
-      margin-bottom: 1rem;
-    }
-
-    .inline-field label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .inline-field-horizontal {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .inline-field-horizontal label {
-      display: inline-block;
-      margin-bottom: 0;
-      flex-shrink: 0;
-    }
-
-    .inline-field input[type="text"],
-    .inline-field select,
-    .inline-field textarea {
-      padding: 0.5rem;
-      font-size: 0.9rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .inline-field select {
-      min-width: 120px;
-    }
-
-    /* Content table styles */
-    .table-label {
-      font-weight: 600;
-      margin: 1.5rem 0 0.5rem 0;
-      color: #333;
-    }
-
-    .content-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1.5rem;
-      font-size: 0.9rem;
-    }
-
-    .content-table th,
-    .content-table td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-    }
-
-    .content-table th {
-      background-color: #f5f5f5;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .content-table td {
-      vertical-align: middle;
-    }
-
-    .table-input {
-      width: 100%;
-      padding: 0.375rem 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-      font-size: 0.85rem;
-      box-sizing: border-box;
-    }
-
-    .table-input:focus {
-      outline: none;
-      border-color: #0066cc;
-    }
-
-    .table-select {
-      width: 100%;
-      padding: 0.375rem 0.5rem;
-      border: 1px solid #ddd;
-      border-radius: 3px;
-      font-size: 0.85rem;
-      background: white;
-      box-sizing: border-box;
-    }
-
-    .table-select:focus {
-      outline: none;
-      border-color: #0066cc;
-    }
-
-    /* Admonition styles */
-    .admonition {
-      border-radius: 4px;
-      padding: 1rem;
-      margin: 1rem 0;
-      border-left: 4px solid;
-    }
-
-    .admonition-title {
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .admonition-content {
-      font-size: 0.95rem;
-    }
-
-    .admonition-info {
-      background-color: #e7f3ff;
-      border-color: #0066cc;
-    }
-
-    .admonition-info .admonition-title {
-      color: #0066cc;
-    }
-
-    .admonition-warning {
-      background-color: #fff8e6;
-      border-color: #f0a000;
-    }
-
-    .admonition-warning .admonition-title {
-      color: #b07800;
-    }
-
-    .admonition-note {
-      background-color: #f0f0f0;
-      border-color: #666;
-    }
-
-    .admonition-note .admonition-title {
-      color: #333;
-    }
-
-    .admonition-tip {
-      background-color: #e6f7e6;
-      border-color: #28a745;
-    }
-
-    .admonition-tip .admonition-title {
-      color: #1e7e34;
-    }
-
-    .admonition-danger {
-      background-color: #ffebee;
-      border-color: #dc3545;
-    }
-
-    .admonition-danger .admonition-title {
-      color: #c82333;
-    }
-
-    @media print {
-      body {
-        background: white;
-      }
-      .container {
-        padding: 0;
-      }
-      .form-actions {
-        display: none;
-      }
-      .content-table {
-        page-break-inside: avoid;
-      }
-    }
-  `;
+  return generateCssFromTokens();
 }
 
 /**
