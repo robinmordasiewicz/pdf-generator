@@ -23,7 +23,8 @@ const __dirname = dirname(__filename);
 
 // Load the JSON Schema for validation
 async function loadJsonSchema(): Promise<object> {
-  const schemaPath = resolve(__dirname, '../../schemas/form-schema.json');
+  // Path from dist/parsers/ to src/schemas/
+  const schemaPath = resolve(__dirname, '../../src/schemas/form-schema.json');
   const schemaContent = await readFile(schemaPath, 'utf-8');
   return JSON.parse(schemaContent) as object;
 }

@@ -1,6 +1,4 @@
 ---
-$schema: '../schemas/form-schema.json'
-
 form:
   id: network-ddos
   title: Network DDoS
