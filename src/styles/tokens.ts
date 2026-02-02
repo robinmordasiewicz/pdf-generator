@@ -247,7 +247,7 @@ export const components = {
     base: {
       borderWidth: borders.width.base,
       borderColor: colors.gray[600],
-      backgroundColor: colors.white,
+      backgroundColor: colors.primary.light, // Light blue background for form fields
     },
     text: {
       fontSize: typography.fontSize.sm,

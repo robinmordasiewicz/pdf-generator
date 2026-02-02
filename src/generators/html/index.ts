@@ -68,7 +68,11 @@ function generateDefaultHtml(
   schema: ParsedFormSchema | null | undefined,
   config: Required<HtmlConfig>
 ): string {
-  const title = markdown?.title ?? schema?.form.title ?? 'Document';
+  // When schema has content, prefer schema title; otherwise use markdown title
+  const hasSchemaContent = schema?.content && schema.content.length > 0;
+  const title = hasSchemaContent
+    ? (schema?.form.title ?? markdown?.title ?? 'Document')
+    : (markdown?.title ?? schema?.form.title ?? 'Document');
 
   let styles = '';
   if (config.embedStyles) {
@@ -88,13 +92,7 @@ function generateDefaultHtml(
 
   const formHtml = schema ? generateFormHtml(schema) : '';
   // Use schema content if available, otherwise fall back to markdown HTML
-  const contentHtml =
-    schema?.content && schema.content.length > 0
-      ? generateContentHtml(schema)
-      : (markdown?.html ?? '');
-
-  // If schema has content, don't wrap in form - content includes its own fields
-  const hasSchemaContent = schema?.content && schema.content.length > 0;
+  const contentHtml = hasSchemaContent ? generateContentHtml(schema) : (markdown?.html ?? '');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -220,19 +218,19 @@ function renderAdmonition(element: AdmonitionContent): string {
 
 function renderInlineField(
   element: FieldContent,
-  enableNumbering: boolean,
-  getFieldNumber: () => number
+  _enableNumbering: boolean,
+  _getFieldNumber: () => number
 ): string {
   const labelPosition = element.labelPosition ?? 'above';
-  const label = enableNumbering
-    ? `${getFieldNumber()}. ${element.label ?? ''}`
-    : (element.label ?? '');
+  // Note: numbering is already applied by schema parser, so we use the label as-is
+  const label = element.label ?? '';
 
   const containerClass =
     labelPosition === 'left' ? 'inline-field inline-field-horizontal' : 'inline-field';
+  // For labels, use min-width to allow expansion if content is wider
   const labelStyle =
     labelPosition === 'left' && element.labelWidth
-      ? ` style="width: ${element.labelWidth}px; min-width: ${element.labelWidth}px"`
+      ? ` style="min-width: ${element.labelWidth}px"`
       : '';
   // For horizontal layout, apply both width and max-width to prevent overflow
   const fieldStyle = element.width
@@ -301,9 +299,9 @@ function renderTable(element: TableContent): string {
   // Calculate total table width from column widths
   const totalWidth = columns.reduce((sum, col) => sum + (col.width ?? 100), 0);
 
-  // Generate header row
+  // Generate header row - use min-width to allow headers to expand if needed
   const headerCells = columns
-    .map((col) => `<th style="width: ${col.width}px">${escapeHtml(col.label)}</th>`)
+    .map((col) => `<th style="min-width: ${col.width}px">${escapeHtml(col.label)}</th>`)
     .join('');
   const headerRow = `<tr>${headerCells}</tr>`;
 
@@ -322,7 +320,7 @@ function renderTable(element: TableContent): string {
 
   return `
     ${tableLabel}
-    <table class="content-table" style="width: ${totalWidth}px">
+    <table class="content-table" style="min-width: ${totalWidth}px">
       <thead>${headerRow}</thead>
       <tbody>${dataRows}</tbody>
     </table>`;
