@@ -69,7 +69,7 @@
     "@types/pngjs": "^6.0.4",
     "@typescript-eslint/eslint-plugin": "^8.54.0",
     "@typescript-eslint/parser": "^8.54.0",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "^4.0.18",
     "better-npm-audit": "^3.11.0",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
@@ -86,7 +86,7 @@
     "stylelint-config-standard": "^40.0.0",
     "typescript": "^5.4.5",
     "typescript-eslint": "^8.54.0",
-    "vitest": "^1.6.0"
+    "vitest": "^4.0.18"
   },
   "engines": {
     "node": ">=18.0.0"
