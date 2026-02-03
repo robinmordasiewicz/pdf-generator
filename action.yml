@@ -12,8 +12,9 @@ inputs:
     required: false
     default: 'generate'
   schema:
-    description: 'Path to YAML schema file or glob pattern (e.g., "schemas/*.yaml")'
-    required: true
+    description: 'Path to YAML schema file or glob pattern'
+    required: false
+    default: 'schemas/*.yaml'
   output:
     description: 'Output directory for generated files'
     required: false
@@ -26,6 +27,26 @@ inputs:
     description: 'Fail the action if validation errors occur'
     required: false
     default: 'true'
+  publish:
+    description: 'Enable GitHub Pages publishing'
+    required: false
+    default: 'true'
+  publish-method:
+    description: 'Publishing method: pages-api (requires deploy-pages action) or branch (pushes to branch directly)'
+    required: false
+    default: 'pages-api'
+  pages-branch:
+    description: 'Branch name for branch-based publishing'
+    required: false
+    default: 'gh-pages'
+  generate-index:
+    description: 'Generate index.html listing all documents'
+    required: false
+    default: 'true'
+  index-title:
+    description: 'Title for the generated index page'
+    required: false
+    default: 'Generated Documents'
 
 outputs:
   files:
@@ -36,6 +57,12 @@ outputs:
     description: 'Number of HTML files generated'
   validation-errors:
     description: 'JSON array of validation errors (if any)'
+  pages-url:
+    description: 'URL of deployed GitHub Pages site'
+  index-file:
+    description: 'Path to generated index.html'
+  pages-artifact-path:
+    description: 'Path for upload-pages-artifact (use with pages-api method)'
 
 runs:
   using: 'node20'
