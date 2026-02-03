@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## 1.0.1 (2026-02-03)
+
+### Bug Fixes
+
+- adjust @types/node to compatible version for Node 20 ([e79d3ad](https://github.com/robinmordasiewicz/yamldocs/commit/e79d3ad4d9e2fd98b13b5cba22a975ea09c60068))
+- improve HTML layout and styling consistency ([16205ab](https://github.com/robinmordasiewicz/yamldocs/commit/16205ab1feefcc575f4ddc5185d22dcd08d39627)), closes [#17](https://github.com/robinmordasiewicz/yamldocs/issues/17)
+
+### Features
+
+- add automated release workflow with npm publishing ([#39](https://github.com/robinmordasiewicz/yamldocs/issues/39)) ([7e24a2f](https://github.com/robinmordasiewicz/yamldocs/commit/7e24a2f027978ce32f013ffcbb3708f056976284))
+- add DNS services and load balancer assessment schemas ([f91d460](https://github.com/robinmordasiewicz/yamldocs/commit/f91d460242e53fd1821c1c88d9242f27ce095b8c)), closes [#33](https://github.com/robinmordasiewicz/yamldocs/issues/33)
+- add field auto-numbering and custom height support ([3ba78ed](https://github.com/robinmordasiewicz/yamldocs/commit/3ba78ed9457cfb6e509e7634cc5224ac65369734)), closes [#2](https://github.com/robinmordasiewicz/yamldocs/issues/2)
+- build all schemas and enhance HTML generation ([b346fef](https://github.com/robinmordasiewicz/yamldocs/commit/b346fefba788394ef67eb07948c9c6ac4ea7795d)), closes [#9](https://github.com/robinmordasiewicz/yamldocs/issues/9)
+- enable global npm install with proper path resolution ([#38](https://github.com/robinmordasiewicz/yamldocs/issues/38)) ([3412a02](https://github.com/robinmordasiewicz/yamldocs/commit/3412a02d7dae0f216c1c0d64b1ed22bc1916989b))
+- implement HTML layout engine with page pagination support ([#26](https://github.com/robinmordasiewicz/yamldocs/issues/26)) ([d00b75f](https://github.com/robinmordasiewicz/yamldocs/commit/d00b75fb2728c270b6aa712275ec0dd8aa248a5b)), closes [#25](https://github.com/robinmordasiewicz/yamldocs/issues/25)
+- implement page layout and pt-to-px conversion for HTML generation ([f0720a0](https://github.com/robinmordasiewicz/yamldocs/commit/f0720a0a5b7310e5164d4de1b4c48d0f71cafa1b)), closes [#23](https://github.com/robinmordasiewicz/yamldocs/issues/23)
+- improve table width and checkbox alignment consistency ([9e4d762](https://github.com/robinmordasiewicz/yamldocs/commit/9e4d7628487b3813b2d6feb0300f96727463450c)), closes [#21](https://github.com/robinmordasiewicz/yamldocs/issues/21)
+- restructure DDoS assessment form with organizational sections ([ed043ef](https://github.com/robinmordasiewicz/yamldocs/commit/ed043ef08af515d771d2d6e682cf515715c57b7a)), closes [#31](https://github.com/robinmordasiewicz/yamldocs/issues/31)
+- upgrade dependencies and rename ddos schema ([f3b39bd](https://github.com/robinmordasiewicz/yamldocs/commit/f3b39bdded93f194e7ead273826bd064c81bef9f)), closes [#7](https://github.com/robinmordasiewicz/yamldocs/issues/7)
+
 ## [1.0.0] - 2025-02-02
 
 ### Added
