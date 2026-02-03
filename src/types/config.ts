@@ -1,6 +1,6 @@
 /**
  * Configuration Types
- * Defines the structure for markdown-2pdf.config.yaml
+ * Defines the structure for yamldocs.config.yaml
  */
 
 export type OutputFormat = 'pdf' | 'html';

@@ -1,5 +1,5 @@
 /**
- * markdown-2pdf
+ * yamldocs
  * Generate fillable PDF forms from YAML schemas
  */
 

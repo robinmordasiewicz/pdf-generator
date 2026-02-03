@@ -1,4 +1,4 @@
-# markdown-2pdf
+# yamldocs
 
 Generate fillable PDF forms with interactive AcroForm fields from markdown content and YAML schema definitions.
 
@@ -17,10 +17,10 @@ Generate fillable PDF forms with interactive AcroForm fields from markdown conte
 
 ```bash
 # Install globally
-npm install -g markdown-2pdf
+npm install -g yamldocs
 
 # Or use with npx
-npx markdown-2pdf generate content.md --schema schema.yaml
+npx yamldocs generate content.md --schema schema.yaml
 ```
 
 ## Quick Start
@@ -28,7 +28,7 @@ npx markdown-2pdf generate content.md --schema schema.yaml
 1. **Initialize a new project:**
 
 ```bash
-markdown-2pdf init my-forms
+yamldocs init my-forms
 cd my-forms
 ```
 
@@ -39,7 +39,7 @@ cd my-forms
 3. **Generate documents:**
 
 ```bash
-markdown-2pdf generate content/sample.md --schema schemas/sample-form.yaml --format pdf,html
+yamldocs generate content/sample.md --schema schemas/sample-form.yaml --format pdf,html
 ```
 
 ## CLI Commands
@@ -47,7 +47,7 @@ markdown-2pdf generate content/sample.md --schema schemas/sample-form.yaml --for
 ### Generate Documents
 
 ```bash
-markdown-2pdf generate <content.md> [options]
+yamldocs generate <content.md> [options]
 
 Options:
   -s, --schema <path>      Path to form schema YAML file
@@ -61,7 +61,7 @@ Options:
 ### Validate Schema
 
 ```bash
-markdown-2pdf validate <schema.yaml> [options]
+yamldocs validate <schema.yaml> [options]
 
 Options:
   -v, --verbose    Show detailed validation info
@@ -70,7 +70,7 @@ Options:
 ### Preview Fields
 
 ```bash
-markdown-2pdf preview <schema.yaml> [options]
+yamldocs preview <schema.yaml> [options]
 
 Options:
   -f, --format <format>    Output format: table, json, yaml (default: table)
@@ -79,7 +79,7 @@ Options:
 ### Initialize Project
 
 ```bash
-markdown-2pdf init [directory]
+yamldocs init [directory]
 ```
 
 ## Schema Format
@@ -267,7 +267,7 @@ fields:
 
 ## Configuration
 
-Create `markdown-2pdf.config.yaml`:
+Create `yamldocs.config.yaml`:
 
 ```yaml
 input:
@@ -320,8 +320,8 @@ See the `examples/` directory for complete examples:
 
 ```bash
 # Clone repository
-git clone https://github.com/your-repo/markdown-2pdf.git
-cd markdown-2pdf
+git clone https://github.com/robinmordasiewicz/yamldocs.git
+cd yamldocs
 
 # Install dependencies
 npm install

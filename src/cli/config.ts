@@ -11,13 +11,13 @@ import type { Config, GenerateOptions } from '../types/index.js';
 import { DEFAULT_CONFIG as DEFAULTS } from '../types/index.js';
 
 const CONFIG_FILENAMES = [
-  'markdown-2pdf.config.yaml',
-  'markdown-2pdf.config.yml',
-  'markdown-2pdf.config.json',
-  '.markdown-2pdfrc',
-  '.markdown-2pdfrc.yaml',
-  '.markdown-2pdfrc.yml',
-  '.markdown-2pdfrc.json',
+  'yamldocs.config.yaml',
+  'yamldocs.config.yml',
+  'yamldocs.config.json',
+  '.yamldocsrc',
+  '.yamldocsrc.yaml',
+  '.yamldocsrc.yml',
+  '.yamldocsrc.json',
 ];
 
 /**
