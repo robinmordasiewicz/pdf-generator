@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+# [1.4.0](https://github.com/robinmordasiewicz/yamlforms/compare/v1...v1.4.0) (2026-02-03)
+
+### Features
+
+- add optional cover page support for PDF, DOCX, and HTML output ([cd76a00](https://github.com/robinmordasiewicz/yamlforms/commit/cd76a00191dbbd6d5d32f296e7778f1a686ff702))
+
 # [1.3.0](https://github.com/robinmordasiewicz/yamlforms/compare/v1...v1.3.0) (2026-02-03)
 
 ### Bug Fixes
