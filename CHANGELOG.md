@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.3](https://github.com/robinmordasiewicz/yamldocs/compare/v1.0.2...v1.0.3) (2026-02-03)
+
+### Bug Fixes
+
+- complete release automation in single workflow ([#43](https://github.com/robinmordasiewicz/yamldocs/issues/43)) ([6d2017c](https://github.com/robinmordasiewicz/yamldocs/commit/6d2017c7373796f391006dac183f965c29a074d9))
+
 ## [1.0.2](https://github.com/robinmordasiewicz/yamldocs/compare/v1.0.1...v1.0.2) (2026-02-03)
 
 ### Bug Fixes
