@@ -80,7 +80,7 @@ export async function generatePdf(options: PdfGeneratorOptions): Promise<Generat
   if (schema.form.author) {
     doc.setAuthor(schema.form.author);
   }
-  doc.setCreator('markdown-2pdf');
+  doc.setCreator('yamldocs');
   doc.setProducer('pdf-lib');
   doc.setCreationDate(new Date());
 

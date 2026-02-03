@@ -1,6 +1,6 @@
 /**
  * Project Initialization
- * Scaffolds a new markdown-2pdf project
+ * Scaffolds a new yamldocs project
  */
 
 import { mkdir, writeFile } from 'fs/promises';
@@ -8,7 +8,7 @@ import { existsSync } from 'fs';
 import { resolve, join } from 'path';
 import chalk from 'chalk';
 
-const SAMPLE_CONFIG = `# markdown-2pdf Configuration
+const SAMPLE_CONFIG = `# yamldocs Configuration
 input:
   schemas: "./schemas"
   styles: "./styles"
@@ -121,7 +121,7 @@ Thumbs.db
 export async function initProject(directory: string): Promise<void> {
   const targetDir = resolve(directory);
 
-  console.log(chalk.cyan('Initializing markdown-2pdf project...'));
+  console.log(chalk.cyan('Initializing yamldocs project...'));
   console.log('');
 
   // Create directories
@@ -140,7 +140,7 @@ export async function initProject(directory: string): Promise<void> {
   // Create files
   const files = [
     {
-      path: 'markdown-2pdf.config.yaml',
+      path: 'yamldocs.config.yaml',
       content: SAMPLE_CONFIG,
     },
     {
@@ -168,6 +168,6 @@ export async function initProject(directory: string): Promise<void> {
   console.log('');
   console.log('Next steps:');
   console.log(chalk.gray('  1. Edit schemas/sample-form.yaml to define your form'));
-  console.log(chalk.gray('  2. Run: markdown-2pdf generate schemas/sample-form.yaml'));
+  console.log(chalk.gray('  2. Run: yamldocs generate schemas/sample-form.yaml'));
   console.log('');
 }
