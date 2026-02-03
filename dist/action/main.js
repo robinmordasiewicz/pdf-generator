@@ -9,6 +9,7 @@ import { mkdir } from 'fs/promises';
 import { parseSchema, SchemaValidationError } from '../parsers/schema.js';
 import { generatePdf, savePdf } from '../generators/pdf/index.js';
 import { generateHtml, saveHtml } from '../generators/html/index.js';
+import { publish, parsePublishOptions } from './publish/index.js';
 /**
  * Parse action inputs from environment
  */
@@ -18,6 +19,12 @@ function getInputs() {
     const output = core.getInput('output') || 'dist';
     const formatInput = core.getInput('format') || 'pdf';
     const failOnError = core.getBooleanInput('fail-on-error');
+    // Parse publish options
+    const publishEnabled = core.getBooleanInput('publish');
+    const publishMethod = core.getInput('publish-method') || 'pages-api';
+    const pagesBranch = core.getInput('pages-branch') || 'gh-pages';
+    const generateIndex = core.getBooleanInput('generate-index');
+    const indexTitle = core.getInput('index-title') || 'Generated Documents';
     // Parse format input
     const format = formatInput
         .split(',')
@@ -35,6 +42,7 @@ function getInputs() {
         output,
         format,
         failOnError,
+        publish: parsePublishOptions(publishEnabled, publishMethod, pagesBranch, generateIndex, indexTitle),
     };
 }
 /**
@@ -235,6 +243,28 @@ async function runGenerate(inputs) {
         core.info(`   Failures: ${failureCount}`);
         if (inputs.failOnError) {
             core.setFailed(`${failureCount} file(s) failed to generate`);
+            return;
+        }
+    }
+    // Publish to GitHub Pages if enabled
+    if (inputs.publish.enabled && successfulFiles.length > 0) {
+        const publishResult = await publish({
+            options: inputs.publish,
+            outputDir: resolve(inputs.output),
+            generatedFiles: successfulFiles,
+        });
+        // Set publish outputs
+        if (publishResult.pagesUrl) {
+            core.setOutput('pages-url', publishResult.pagesUrl);
+        }
+        if (publishResult.indexFile) {
+            core.setOutput('index-file', publishResult.indexFile);
+        }
+        if (publishResult.artifactPath) {
+            core.setOutput('pages-artifact-path', publishResult.artifactPath);
+        }
+        if (!publishResult.success && inputs.failOnError) {
+            core.setFailed(`Publishing failed: ${publishResult.error ?? 'Unknown error'}`);
         }
     }
 }

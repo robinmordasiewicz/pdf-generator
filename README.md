@@ -95,30 +95,41 @@ Use yamlforms in your CI/CD workflows to generate PDF forms automatically.
 ### Basic Usage
 
 ```yaml
+# Uses default schema path: schemas/*.yaml
+- uses: robinmordasiewicz/yamlforms@v1
+
+# Or specify a custom schema path
 - uses: robinmordasiewicz/yamlforms@v1
   with:
-    schema: 'schemas/my-form.yaml'
-    output: 'dist'
+    schema: 'forms/my-form.yaml'
 ```
 
 ### Inputs
 
-| Input           | Description                              | Required | Default    |
-| --------------- | ---------------------------------------- | -------- | ---------- |
-| `command`       | Command to run: `generate` or `validate` | No       | `generate` |
-| `schema`        | Path to YAML schema file or glob pattern | Yes      | -          |
-| `output`        | Output directory for generated files     | No       | `dist`     |
-| `format`        | Output formats: `pdf`, `html`, or both   | No       | `pdf`      |
-| `fail-on-error` | Fail the action if errors occur          | No       | `true`     |
+| Input            | Description                                | Required | Default               |
+| ---------------- | ------------------------------------------ | -------- | --------------------- |
+| `command`        | Command to run: `generate` or `validate`   | No       | `generate`            |
+| `schema`         | Path to YAML schema file or glob pattern   | No       | `schemas/*.yaml`      |
+| `output`         | Output directory for generated files       | No       | `dist`                |
+| `format`         | Output formats: `pdf`, `html`, or both     | No       | `pdf`                 |
+| `fail-on-error`  | Fail the action if errors occur            | No       | `true`                |
+| `publish`        | Enable GitHub Pages publishing             | No       | `true`                |
+| `publish-method` | Publishing method: `pages-api` or `branch` | No       | `pages-api`           |
+| `pages-branch`   | Branch for branch-based publishing         | No       | `gh-pages`            |
+| `generate-index` | Generate index.html listing documents      | No       | `true`                |
+| `index-title`    | Title for the generated index page         | No       | `Generated Documents` |
 
 ### Outputs
 
-| Output              | Description                              |
-| ------------------- | ---------------------------------------- |
-| `files`             | JSON array of generated file paths       |
-| `pdf-count`         | Number of PDF files generated            |
-| `html-count`        | Number of HTML files generated           |
-| `validation-errors` | JSON array of validation errors (if any) |
+| Output                | Description                              |
+| --------------------- | ---------------------------------------- |
+| `files`               | JSON array of generated file paths       |
+| `pdf-count`           | Number of PDF files generated            |
+| `html-count`          | Number of HTML files generated           |
+| `validation-errors`   | JSON array of validation errors (if any) |
+| `pages-url`           | URL of deployed GitHub Pages site        |
+| `index-file`          | Path to generated index.html             |
+| `pages-artifact-path` | Path for upload-pages-artifact           |
 
 ### Examples
 
@@ -154,6 +165,66 @@ Use yamlforms in your CI/CD workflows to generate PDF forms automatically.
   with:
     name: forms
     path: dist/
+```
+
+**Publish to GitHub Pages (Pages API method - recommended):**
+
+```yaml
+permissions:
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: robinmordasiewicz/yamlforms@v1
+        with:
+          schema: 'schemas/*.yaml'
+          format: 'pdf,html'
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+      - uses: actions/deploy-pages@v4
+        id: deployment
+```
+
+**Publish to GitHub Pages (branch method - self-contained):**
+
+```yaml
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: robinmordasiewicz/yamlforms@v1
+        with:
+          schema: 'schemas/*.yaml'
+          format: 'pdf,html'
+          publish-method: branch
+          pages-branch: gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+**Disable publishing (generate only):**
+
+```yaml
+- uses: robinmordasiewicz/yamlforms@v1
+  with:
+    schema: 'schemas/*.yaml'
+    publish: false
 ```
 
 ## Schema Format
