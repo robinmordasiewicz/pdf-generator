@@ -36,6 +36,7 @@ import {
 import { drawSchemaContent } from './content.js';
 import { drawCoverPage } from './coverpage.js';
 import { resolveFooterConfig } from '../footer-utils.js';
+import { insertTocPages } from './toc.js';
 
 export interface PdfGeneratorOptions {
   schema: ParsedFormSchema;
@@ -100,14 +101,7 @@ export async function generatePdf(options: PdfGeneratorOptions): Promise<Generat
     nextPage(ctx);
   }
 
-  // Draw header and footer on content pages only (skip cover page)
-  const startPage = hasCoverPage ? 1 : 0;
-  await drawHeader(ctx, schema.form.title, { pageNumber: true, startPage });
-
-  const resolvedFooter = resolveFooterConfig(schema.footer, schema.form);
-  await drawFooter(ctx, resolvedFooter, { startPage });
-
-  // Draw content: use schema content when available
+  // Draw content first (before headers/footers) so we can collect heading page numbers for TOC
   const hasSchemaContentToDraw = schema.content && schema.content.length > 0;
   if (hasSchemaContentToDraw && schema.content) {
     // Draw schema-defined content elements using flow positioning
@@ -123,7 +117,7 @@ export async function generatePdf(options: PdfGeneratorOptions): Promise<Generat
   // Skip field labels when schema content provides the context (text field labels above)
 
   // Page offset: when cover page is present, schema page 1 maps to array index 1
-  const pageOffset = hasCoverPage ? 1 : 0;
+  let pageOffset = hasCoverPage ? 1 : 0;
 
   let fieldCount = 0;
   for (const field of schema.fields) {
@@ -131,6 +125,24 @@ export async function generatePdf(options: PdfGeneratorOptions): Promise<Generat
     await addFieldToDocument(doc, ctx, adjustedField, hasSchemaContentToDraw, pageOffset);
     fieldCount++;
   }
+
+  // Insert TOC pages after content rendering (page numbers are now known)
+  const tocPageCount = await insertTocPages(
+    ctx,
+    schema.tableOfContents,
+    schema.content,
+    hasCoverPage
+  );
+
+  // Adjust page offset to account for inserted TOC pages
+  pageOffset += tocPageCount;
+
+  // Draw header and footer on content pages only (skip cover page and TOC pages)
+  const startPage = (hasCoverPage ? 1 : 0) + tocPageCount;
+  await drawHeader(ctx, schema.form.title, { pageNumber: true, startPage });
+
+  const resolvedFooter = resolveFooterConfig(schema.footer, schema.form);
+  await drawFooter(ctx, resolvedFooter, { startPage });
 
   // Serialize PDF
   const bytes = await doc.save();

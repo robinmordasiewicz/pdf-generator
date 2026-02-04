@@ -40,6 +40,13 @@ import {
   type ResolvedFooter,
 } from '../footer-utils.js';
 import { loadSocialIconBase64 } from '../icon-utils.js';
+import {
+  resolveTocConfig,
+  extractTocEntries,
+  assignNumbering,
+  generateAnchorId,
+  type TocEntry,
+} from '../toc-utils.js';
 
 export interface HtmlGeneratorOptions {
   schema: ParsedFormSchema;
@@ -91,12 +98,16 @@ async function generateDefaultHtml(
   // Resolve footer config
   const resolvedFooter = resolveFooterConfig(schema.footer, schema.form);
 
+  const tocConfig = resolveTocConfig(schema.tableOfContents);
+  const hasToc = !!tocConfig && !!schema.content && schema.content.length > 0;
+
   let styles = '';
   if (config.embedStyles) {
     styles = `
     <style>
       ${getDefaultStyles(config.pageLayout)}
       ${hasCoverPage ? getCoverPageCss() : ''}
+      ${hasToc ? getTocStyles() : ''}
     </style>`;
   }
 
@@ -105,6 +116,7 @@ async function generateDefaultHtml(
     scripts = `
     <script>
       ${getFormScripts()}
+      ${hasToc ? getTocScrollSpyScript() : ''}
     </script>`;
   }
 
@@ -117,6 +129,9 @@ async function generateDefaultHtml(
   const coverPageHtml =
     hasCoverPage && schema.coverPage ? renderCoverPageHtml(schema.form, schema.coverPage) : '';
 
+  // Generate TOC HTML
+  const tocHtml = hasToc ? generateTocHtml(schema) : '';
+
   if (pageLayoutEnabled && hasSchemaContent) {
     // Use multi-page layout with pagination for schema content
     bodyContent = await generateMultiPageContent(
@@ -124,7 +139,8 @@ async function generateDefaultHtml(
       title,
       config,
       coverPageHtml,
-      resolvedFooter
+      resolvedFooter,
+      tocHtml
     );
   } else if (pageLayoutEnabled) {
     // Single page layout for simple content
@@ -237,7 +253,8 @@ async function generateMultiPageContent(
   title: string,
   config: Required<HtmlConfig>,
   coverPageHtml = '',
-  footer?: ResolvedFooter
+  footer?: ResolvedFooter,
+  tocHtml = ''
 ): Promise<string> {
   const pageSize = (config.pageLayout?.pageSize ?? 'a4') as HtmlPageSize;
   const ctx = initializeHtmlLayout(pageSize);
@@ -333,9 +350,19 @@ async function generateMultiPageContent(
   );
   const pagesHtml = pageHtmlArray.join('\n');
 
+  // Generate TOC page if present
+  const tocPageHtml = tocHtml
+    ? `<div class="page toc-page">
+        <div class="page-content">
+          ${tocHtml}
+        </div>
+      </div>`
+    : '';
+
   return `
   <div class="page-layout-wrapper">
     ${coverPageHtml}
+    ${tocPageHtml}
     ${pagesHtml}
   </div>`;
 }
@@ -435,7 +462,8 @@ function renderContentElement(
 
 function renderHeading(element: HeadingContent): string {
   const level = element.level ?? 2;
-  return `<h${level}>${escapeHtml(element.text)}</h${level}>`;
+  const anchorId = generateAnchorId(element.text);
+  return `<h${level} id="${anchorId}">${escapeHtml(element.text)}</h${level}>`;
 }
 
 function renderParagraph(element: ParagraphContent): string {
@@ -913,6 +941,171 @@ function getFormScripts(): string {
         });
       });
     });
+  `;
+}
+
+/**
+ * Generate TOC HTML sidebar from schema content
+ */
+function generateTocHtml(schema: ParsedFormSchema): string {
+  const config = resolveTocConfig(schema.tableOfContents);
+  if (!config || !schema.content || schema.content.length === 0) return '';
+
+  let entries = extractTocEntries(schema.content, config);
+  if (entries.length === 0) return '';
+
+  if (config.numbered) {
+    entries = assignNumbering(entries);
+  }
+
+  const listTag = config.numbered ? 'ol' : 'ul';
+  const minLevel = Math.min(...entries.map((e) => e.level));
+
+  const buildTocList = (items: TocEntry[]): string => {
+    let html = `<${listTag} class="toc-list">`;
+    for (const entry of items) {
+      const indent = entry.level - minLevel;
+      const displayText =
+        config.numbered && entry.numbering
+          ? `${entry.numbering} ${escapeHtml(entry.text)}`
+          : escapeHtml(entry.text);
+      html += `<li class="toc-entry toc-level-${indent}">`;
+      html += `<a href="#${entry.anchorId}" class="toc-link">${displayText}</a>`;
+      html += `</li>`;
+    }
+    html += `</${listTag}>`;
+    return html;
+  };
+
+  return `
+    <nav class="table-of-contents" aria-label="Table of Contents">
+      <div class="toc-title">${escapeHtml(config.title)}</div>
+      ${buildTocList(entries)}
+    </nav>`;
+}
+
+/**
+ * Get TOC CSS styles
+ */
+function getTocStyles(): string {
+  return `
+    .table-of-contents {
+      position: sticky;
+      top: 20px;
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      padding: 16px 20px;
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      margin-bottom: 24px;
+    }
+
+    .toc-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1a1a1a;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #dee2e6;
+    }
+
+    .toc-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    ol.toc-list {
+      list-style: none;
+    }
+
+    .toc-entry {
+      margin: 0;
+      padding: 0;
+    }
+
+    .toc-link {
+      display: block;
+      padding: 4px 0;
+      color: #495057;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.4;
+      border-left: 2px solid transparent;
+      padding-left: 8px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+
+    .toc-link:hover {
+      color: #0d6efd;
+    }
+
+    .toc-link.toc-active {
+      color: #0d6efd;
+      border-left-color: #0d6efd;
+      font-weight: 500;
+    }
+
+    .toc-level-1 .toc-link { padding-left: 24px; }
+    .toc-level-2 .toc-link { padding-left: 40px; }
+    .toc-level-3 .toc-link { padding-left: 56px; }
+    .toc-level-4 .toc-link { padding-left: 72px; }
+    .toc-level-5 .toc-link { padding-left: 88px; }
+
+    /* Page-layout TOC: insert as a page before content */
+    .toc-page .table-of-contents {
+      position: static;
+      max-height: none;
+      overflow: visible;
+      background: transparent;
+      border: none;
+      border-radius: 0;
+      padding: 0;
+    }
+
+    /* Responsive: collapse on narrow viewports */
+    @media (max-width: 768px) {
+      .table-of-contents {
+        position: static;
+        max-height: none;
+      }
+    }
+  `;
+}
+
+/**
+ * Get TOC scroll-spy JavaScript
+ */
+function getTocScrollSpyScript(): string {
+  return `
+    // TOC scroll-spy: highlight active heading
+    (function() {
+      const tocLinks = document.querySelectorAll('.toc-link');
+      if (tocLinks.length === 0) return;
+
+      const headingIds = Array.from(tocLinks).map(function(link) {
+        return link.getAttribute('href').substring(1);
+      });
+
+      const headings = headingIds
+        .map(function(id) { return document.getElementById(id); })
+        .filter(function(el) { return el !== null; });
+
+      if (headings.length === 0) return;
+
+      var observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            tocLinks.forEach(function(link) { link.classList.remove('toc-active'); });
+            var activeLink = document.querySelector('.toc-link[href="#' + entry.target.id + '"]');
+            if (activeLink) activeLink.classList.add('toc-active');
+          }
+        });
+      }, { rootMargin: '-20% 0px -70% 0px', threshold: 0 });
+
+      headings.forEach(function(heading) { observer.observe(heading); });
+    })();
   `;
 }
 
