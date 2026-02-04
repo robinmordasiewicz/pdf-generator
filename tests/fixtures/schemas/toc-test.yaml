@@ -1,0 +1,80 @@
+---
+# Table of Contents Test Schema
+# Tests TOC generation with multiple heading levels
+
+$schema: '../schemas/form-schema.json'
+
+form:
+  id: toc-test
+  title: Table of Contents Test
+  version: '1.0.0'
+  description: Test schema for Table of Contents feature
+  pages: 2
+  positioning: flow
+
+tableOfContents:
+  enabled: true
+  title: 'Table of Contents'
+  minLevel: 1
+  maxLevel: 3
+  numbered: true
+  showPageNumbers: true
+
+content:
+  - type: heading
+    level: 1
+    text: 'Introduction'
+
+  - type: paragraph
+    text: 'This is the introduction section of the document.'
+
+  - type: heading
+    level: 2
+    text: 'Background'
+
+  - type: paragraph
+    text: 'Some background information about the subject matter.'
+
+  - type: heading
+    level: 2
+    text: 'Objectives'
+
+  - type: paragraph
+    text: 'The main objectives of this document.'
+
+  - type: heading
+    level: 3
+    text: 'Primary Goals'
+
+  - type: paragraph
+    text: 'Details about the primary goals.'
+
+  - type: heading
+    level: 1
+    text: 'Main Content'
+
+  - type: paragraph
+    text: 'The main content section of the document.'
+
+  - type: heading
+    level: 2
+    text: 'Details'
+
+  - type: paragraph
+    text: 'Detailed information about the main content.'
+
+  - type: heading
+    level: 3
+    text: 'Sub-details'
+
+  - type: paragraph
+    text: 'Even more detailed information.'
+
+  - type: heading
+    level: 1
+    text: 'Conclusion'
+
+  - type: paragraph
+    text: 'The conclusion of the document.'
+
+fields: []

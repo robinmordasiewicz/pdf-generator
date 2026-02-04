@@ -108,6 +108,86 @@ coverPage:
       description: 'Added cover page feature, finalized for release'
 
 # =============================================================================
+# TABLE OF CONTENTS (Optional)
+# =============================================================================
+# When present, an auto-generated Table of Contents is inserted after the
+# cover page (or at the start if no cover page). The TOC scans heading
+# elements from the content array and renders a navigable index.
+#
+# PDF:  TOC page(s) with dot leaders, page numbers, and indented entries
+# HTML: Sticky sidebar with scroll-spy highlighting and anchor links
+# DOCX: Native Word TOC field (updates when opened in Word)
+tableOfContents:
+  # Enable or disable TOC generation (default: true when section is present)
+  enabled: true
+
+  # Title displayed at the top of the TOC (default: 'Table of Contents')
+  title: 'Table of Contents'
+
+  # Minimum heading level to include (1-6, default: 1)
+  minLevel: 1
+
+  # Maximum heading level to include (1-6, default: 3)
+  maxLevel: 3
+
+  # Add hierarchical numbering (1, 1.1, 1.1.1) to entries (default: false)
+  numbered: true
+
+  # Show page numbers with dot leaders in PDF/DOCX (default: true)
+  showPageNumbers: true
+
+# =============================================================================
+# FOOTER (Optional)
+# =============================================================================
+# Configures a footer on every content page (not the cover page).
+# The footer supports a three-section layout (left | center | right) with
+# template variables that are resolved at render time:
+#   {{title}}   - form.title
+#   {{version}} - form.version
+#   {{date}}    - current date
+#   {{author}}  - form.author
+#   {{page}}    - current page number
+#   {{pages}}   - total page count
+#
+# PDF:  Three-column footer with optional separator line and social icons
+# HTML: Fixed footer bar with sections and icon links
+# DOCX: Native Word footer with tab-stop alignment
+footer:
+  # Enable or disable footer rendering (default: true when section is present)
+  enabled: true
+
+  # --- Three-section layout ---
+  # Each section accepts plain text or template variables.
+  left: '{{title}}'
+  center: 'Version {{version}}'
+  right: 'Page {{page}} of {{pages}}'
+
+  # --- Shorthand properties ---
+  # These are convenience aliases; explicit left/center/right take precedence.
+  # copyright: '(c) 2024 YAMLForms Project'   # Sets left section
+  # text: 'Confidential'                       # Sets center section
+  # showPageNumbers: true                      # Adds "Page X of Y" to right
+  # showVersion: true                          # Appends version to center
+  # showDate: true                             # Adds current date to an open section
+
+  # --- Separator line above the footer ---
+  separator:
+    enabled: true
+    color: '#cccccc'
+    thickness: 0.5
+
+  # --- Social media links ---
+  # Rendered as icon links below the footer text (PDF/HTML).
+  # Only platforms with a URL are displayed.
+  socialLinks:
+    youtube: 'https://youtube.com/@yamlforms'
+    x: 'https://x.com/yamlforms'
+    facebook: 'https://facebook.com/yamlforms'
+    linkedin: 'https://linkedin.com/company/yamlforms'
+    github: 'https://github.com/robinmordasiewicz/yamlforms'
+    website: 'https://yamlforms.dev'
+
+# =============================================================================
 # CONTENT ELEMENTS
 # =============================================================================
 # Content elements define the structure and layout of your form.

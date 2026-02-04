@@ -283,10 +283,20 @@ export interface FooterConfig {
   socialLinks?: FooterSocialLinks;
 }
 
+export interface TableOfContents {
+  enabled?: boolean;
+  title?: string;
+  minLevel?: 1 | 2 | 3 | 4 | 5 | 6;
+  maxLevel?: 1 | 2 | 3 | 4 | 5 | 6;
+  numbered?: boolean;
+  showPageNumbers?: boolean;
+}
+
 export interface FormSchema {
   $schema?: string;
   form: FormMetadata;
   coverPage?: CoverPage;
+  tableOfContents?: TableOfContents;
   footer?: FooterConfig;
   content?: SchemaContentElement[];
   fields: FormField[];

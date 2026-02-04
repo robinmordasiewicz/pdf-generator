@@ -5,7 +5,7 @@
 
 import { writeFile, mkdir } from 'fs/promises';
 import { dirname, resolve } from 'path';
-import { Document, Paragraph, Table, Packer, TextRun } from 'docx';
+import { Document, Paragraph, Table, Packer, TextRun, TableOfContents } from 'docx';
 import type { ParsedFormSchema, NormalizedFormField, DocxConfig } from '../../types/index.js';
 import type { ResolvedStylesheet } from '../../types/stylesheet.js';
 import { DEFAULT_CONFIG } from '../../types/index.js';
@@ -25,6 +25,7 @@ import {
 import { mapFontFamily, hexToDocxColor, ptToTwip } from './utils.js';
 import { createCoverPageSection } from './coverpage.js';
 import { resolveFooterConfig } from '../footer-utils.js';
+import { createDocxToc } from './toc.js';
 
 export interface DocxGeneratorOptions {
   schema: ParsedFormSchema;
@@ -77,7 +78,13 @@ export async function generateDocx(options: DocxGeneratorOptions): Promise<Gener
     sections.push(coverSection);
   }
 
-  const children: (Paragraph | Table)[] = [];
+  const children: (Paragraph | Table | TableOfContents)[] = [];
+
+  // Insert Table of Contents if configured
+  const tocElements = createDocxToc(schema.tableOfContents, stylesheet);
+  if (tocElements.length > 0) {
+    children.push(...tocElements);
+  }
 
   // Draw content: use schema content when available
   const hasSchemaContent = schema.content && schema.content.length > 0;
