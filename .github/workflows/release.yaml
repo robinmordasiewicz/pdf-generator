@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.PAT_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN || github.token }}
 
       - uses: actions/setup-node@v4
         with:
@@ -107,7 +107,7 @@ jobs:
         if: steps.params.outputs.should_release == 'true'
         id: release
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || github.token }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           VERSION_ARG="${{ steps.params.outputs.version_arg }}"
@@ -125,7 +125,7 @@ jobs:
           tag_name: v${{ steps.release.outputs.version }}
           generate_release_notes: true
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN || github.token }}
 
       - name: Update major version tag
         if: steps.params.outputs.should_release == 'true' && steps.release.outputs.version
